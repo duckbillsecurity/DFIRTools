@@ -6,6 +6,9 @@ param(
     [string]$DestDir
 )
 
+# Define the full path to git.exe
+$GitExe = "C:\Users\fred.AND\Downloads\PortableGit\bin\git.exe"
+
 function Init-Header {
 @"
 ###########
@@ -41,8 +44,8 @@ function Traverse-Tree {
         [Parameter(Mandatory=$true)]
         [string]$Path
     )
-    # Get tree data using git ls-tree
-    $treeOutput = git ls-tree $Tree
+    # Get tree data using git ls-tree via the full path
+    $treeOutput = & $GitExe ls-tree $Tree
     foreach ($line in $treeOutput) {
         # Parse each line using regex:
         # Expected format: <mode> <type> <hash><TAB><name>
@@ -53,7 +56,7 @@ function Traverse-Tree {
 
             # Verify the git object exists
             try {
-                git cat-file -e $hash 2>$null
+                & $GitExe cat-file -e $hash 2>$null
             }
             catch {
                 continue
@@ -63,7 +66,7 @@ function Traverse-Tree {
 
             if ($type -eq "blob") {
                 Write-Host "[+] Found file: $targetPath" -ForegroundColor Green
-                git cat-file -p $hash | Out-File -FilePath $targetPath -Encoding utf8
+                & $GitExe cat-file -p $hash | Out-File -FilePath $targetPath -Encoding utf8
             }
             else {
                 Write-Host "[+] Found folder: $targetPath" -ForegroundColor Green
@@ -91,7 +94,7 @@ function Traverse-Commit {
     $commitPath = Join-Path $Base $commitDirName
     New-Item -ItemType Directory -Path $commitPath | Out-Null
     # Save commit meta information
-    git cat-file -p $Commit | Out-File -FilePath (Join-Path $commitPath "commit-meta.txt") -Encoding utf8
+    & $GitExe cat-file -p $Commit | Out-File -FilePath (Join-Path $commitPath "commit-meta.txt") -Encoding utf8
     # Attempt to extract the tree contents of the commit
     Traverse-Tree -Tree $Commit -Path $commitPath
 }
@@ -112,7 +115,7 @@ Get-ChildItem -Path ".git\objects" -Recurse -File | ForEach-Object {
     # In Git, objects are stored in a two-level directory.
     # Combine the directory name (first two characters) with the filename (remaining 38 characters)
     $objectHash = "$($_.Directory.Name)$($_.Name)"
-    $type = (git cat-file -t $objectHash 2>$null).Trim()
+    $type = (& $GitExe cat-file -t $objectHash 2>$null).Trim()
     
     # Only process commit objects
     if ($type -eq "commit") {
