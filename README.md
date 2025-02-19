@@ -2,12 +2,14 @@
 Tools to help perform DFIR
 
 ## GitDumper
+Script ported to PowerShell from https://github.com/internetwache/GitTools
 
 ```
 .\gitdumper.ps1 https://www.domain.com/.git/ C:\Projects\gitdump\amarconline --git-dir=.git
 ```
 
 ## GitExtractor
+Script ported to PowerShell from https://github.com/internetwache/GitTools
 
 1. Download: 64-bit Git for Windows Portable
 https://git-scm.com/downloads/win
