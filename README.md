@@ -13,7 +13,7 @@ Tools to help perform DFIR
 https://git-scm.com/downloads/win
 Extract and copy gitextractor.ps1 to bin directory
 
-2. When run from client update path to git.exe
+2. When run from client, make sure to update path in script to git.exe
 
 ```
 .\gitextractor.ps1 -GitDir "C:\Projects\gitdump\domain" -DestDir "C:\Projects\gitdump\extract"
